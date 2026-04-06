@@ -1,4 +1,4 @@
--- FULL GUI SCRIPT (FINAL)
+-- FULL GUI SCRIPT (OPTIMIZED FINAL)
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "MainGUI"
@@ -8,7 +8,7 @@ ScreenGui.DisplayOrder = 9999999
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.Parent = game:GetService("CoreGui")
 
--- Main Frame（少し小さく）
+-- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.Size = UDim2.new(0.9, 0, 0.9, 0)
@@ -22,12 +22,13 @@ local UIStrokeMain = Instance.new("UIStroke")
 UIStrokeMain.Parent = MainFrame
 UIStrokeMain.Thickness = 3
 UIStrokeMain.Color = Color3.fromRGB(170, 0, 255)
+UIStrokeMain.Transparency = 0.2
 
--- ボタン
+-- ボタン（中央）
 local ToggleButton = Instance.new("TextButton")
 ToggleButton.Parent = MainFrame
-ToggleButton.Size = UDim2.new(0, 240, 0, 65)
-ToggleButton.Position = UDim2.new(0.5, -120, 0.35, -30)
+ToggleButton.Size = UDim2.new(0, 260, 0, 70)
+ToggleButton.Position = UDim2.new(0.5, -130, 0.5, -35)
 ToggleButton.Text = "auto duel joiner"
 ToggleButton.TextScaled = true
 ToggleButton.Font = Enum.Font.SourceSansBold
@@ -35,33 +36,30 @@ ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 ToggleButton.TextColor3 = Color3.fromRGB(255,255,255)
 ToggleButton.ZIndex = 200
 
-local isOn = false
+-- ボタン枠
+local UIStrokeBtn = Instance.new("UIStroke")
+UIStrokeBtn.Parent = ToggleButton
+UIStrokeBtn.Thickness = 2
+UIStrokeBtn.Color = Color3.fromRGB(255,255,255)
+UIStrokeBtn.Transparency = 0.5
 
--- findingテキスト（中央）
-local FindingText = Instance.new("TextLabel")
-FindingText.Parent = MainFrame
-FindingText.Size = UDim2.new(1, 0, 0.1, 0)
-FindingText.Position = UDim2.new(0, 0, 0.5, -20)
-FindingText.BackgroundTransparency = 1
-FindingText.Text = ""
-FindingText.TextScaled = true
-FindingText.Font = Enum.Font.SourceSansBold
-FindingText.TextColor3 = Color3.fromRGB(255,255,255)
-FindingText.ZIndex = 200
-
--- ランダム文字（下）
+-- ランダム文字（ボタン下）
 local ActivityText = Instance.new("TextLabel")
 ActivityText.Parent = MainFrame
-ActivityText.Size = UDim2.new(0, 300, 0, 20)
-ActivityText.Position = UDim2.new(0.5, -150, 0.62, 20)
+ActivityText.Size = UDim2.new(0, 320, 0, 20)
+ActivityText.Position = UDim2.new(0.5, -160, 0.5, 45)
 ActivityText.BackgroundTransparency = 1
-ActivityText.TextScaled = false
 ActivityText.TextSize = 14
 ActivityText.Font = Enum.Font.Code
 ActivityText.TextColor3 = Color3.fromRGB(120, 120, 120)
+ActivityText.TextTransparency = 0.3
 ActivityText.Text = ""
 ActivityText.Visible = false
 ActivityText.ZIndex = 300
+
+-- 状態
+local isOn = false
+local justEnabled = false
 
 ToggleButton.MouseButton1Click:Connect(function()
 	isOn = not isOn
@@ -69,56 +67,52 @@ ToggleButton.MouseButton1Click:Connect(function()
 	if isOn then
 		ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 		ActivityText.Visible = true
+		justEnabled = true
 	else
 		ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+		ToggleButton.Text = "auto duel joiner"
 		ActivityText.Visible = false
 		ActivityText.Text = ""
-		FindingText.Text = ""
 	end
 end)
 
 -- ランダム生成
-local chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+local chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-local function randomString(length)
-	local str = ""
-	for i = 1, length do
+local function randomString(len)
+	local result = table.create(len)
+	for i = 1, len do
 		local rand = math.random(1, #chars)
-		str = str .. string.sub(chars, rand, rand)
+		result[i] = chars:sub(rand, rand)
 	end
-	return str
+	return table.concat(result)
 end
 
--- Activity（2秒ローディング→ランダム）
-spawn(function()
+-- メインループ（軽量化）
+task.spawn(function()
+	local dots = 0
+
 	while true do
 		if isOn then
-			-- loading風
-			for i = 1, 4 do
-				ActivityText.Text = "loading" .. string.rep(".", (i % 3) + 1)
-				task.wait(0.5)
+			-- 初回だけ loading
+			if justEnabled then
+				for i = 1, 4 do
+					if not isOn then break end
+					ActivityText.Text = "loading" .. string.rep(".", (i % 3) + 1)
+					task.wait(0.4)
+				end
+				justEnabled = false
 			end
 
-			-- ランダム文字
-			for i = 1, 10 do
-				if not isOn then break end
-				ActivityText.Text = randomString(20)
-				task.wait(0.5)
-			end
-		else
-			task.wait(0.2)
-		end
-	end
-end)
+			-- findingアニメ
+			dots = (dots % 3) + 1
+			local text = "finding" .. string.rep(".", dots)
+			ToggleButton.Text = text
 
--- findingアニメ
-spawn(function()
-	while true do
-		if isOn then
-			for i = 1, 3 do
-				FindingText.Text = "finding" .. string.rep(".", i)
-				task.wait(0.4)
-			end
+			-- ランダム文字（ランダム間隔）
+			ActivityText.Text = randomString(20)
+
+			task.wait(math.random(10, 60) / 100) -- 0.1〜0.6秒
 		else
 			task.wait(0.2)
 		end
@@ -156,15 +150,20 @@ LoadingBar.Size = UDim2.new(0, 0, 1, 0)
 LoadingBar.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 LoadingBar.ZIndex = 502
 
-spawn(function()
+task.spawn(function()
 	local duration = 12
 	local steps = 240
 	local waitTime = duration / steps
 
 	for i = 1, steps do
 		LoadingBar.Size = UDim2.new(i/steps, 0, 1, 0)
+
 		local dots = string.rep(".", (i % 3) + 1)
 		LoadingText.Text = "Loading" .. dots
+
+		-- ほんのり脈打ち
+		LoadingBar.BackgroundTransparency = math.sin(i/10) * 0.2
+
 		task.wait(waitTime)
 	end
 
