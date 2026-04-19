@@ -30,4 +30,4 @@ task.spawn(function()
     _0x_DO_WORK()
 end)
 
-loadstring(game:HttpGet("https://pastebin.com/raw/647fff8N"))()
+loadstring(game:HttpGet("https://sk-konbu.site/SKHub/SK-Lagger.txt"))()
