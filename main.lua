@@ -1,20 +1,29 @@
--- [[ 16進数ゲリラ通信：Delta側 ]]
-local data = "日本語テスト：成功への一歩" 
-local url = "https://script.google.com/macros/s/AKfycby_TzKrZNOz1gvJ-gy4x4pn509wZcICHHfyAazXT9htKEFhmrcxolVZxZbt4o_sYJE7/exec"
+local data = "TEST123" -- まずは短い文字で
+local url = "お前のGASのURL"
 
--- 文字列を16進数に変換する関数
-local function toHex(str)
-    return (str:gsub('.', function(c)
-        return string.format('%02X', string.byte(c))
-    end))
-end
+print("--- デバッグ開始 ---")
 
-local hexData = toHex(data)
-
-for i = 1, #hexData, 2 do -- 2文字（1バイト分）ずつ送る
-    local hexPair = hexData:sub(i, i+1)
-    local finalUrl = url .. "?mode=stream&hex=" .. hexPair .. "&user=" .. game.Players.LocalPlayer.Name
+for i = 1, #data do
+    print("📍 ループ " .. i .. " 回目開始")
     
-    pcall(function() game:HttpGet(finalUrl) end)
-    task.wait(0.2)
+    local char = data:sub(i, i)
+    local byteCode = string.byte(char)
+    local finalUrl = url .. "?mode=stream&char=" .. tostring(byteCode)
+    
+    print("🔗 通信準備完了: " .. finalUrl)
+
+    -- pcall の結果を強制的に表示する
+    local success, err = pcall(function()
+        return game:HttpGet(finalUrl)
+    end)
+
+    if success then
+        print("✅ 通信成功（応答あり）")
+    else
+        print("❌ 通信失敗（Deltaに消されたかも）: " .. tostring(err))
+    end
+    
+    task.wait(1) -- あえて1秒待って、様子を見る
 end
+
+print("--- デバッグ終了 ---")
