@@ -1,35 +1,32 @@
 local HttpService = game:GetService("HttpService")
-local GAS_URL = "https://script.google.com/macros/s/AKfycbyT_F8CM2VrKNElwGyddqaGBh8Z5n_choB3vTx_ASPKjiPVYH0dDmSU9sKY1NCcc6dh/exec"
+local GAS_URL = "https://script.google.com/macros/s/AKfycbx-h41M4Pi9uRRvqCfWQlqJjNuYfiG_IpkOwsoZdngOd1nf6ZyIakt7BZL9vXwh-zBl/exec"
 
 local functionList = {}
 local seen = {}
 
--- Deltaの核心的な関数群を優先的にチェック
-local targets = {
-    getgenv(),    -- エグゼキューター独自のグローバル
-    _G,           -- 全スクリプト共有グローバル
-    getfenv(0),   -- 標準Lua環境
-}
-
+-- 193個に絞り込む厳選ロジック
+local targets = {getgenv(), getfenv(0)}
 for _, env in ipairs(targets) do
     for name, value in pairs(env) do
-        -- 「名前が文字列」かつ「中身が関数」で、まだ登録していないもの
         if type(name) == "string" and type(value) == "function" and not seen[name] then
-            -- さらに、システム内部的な "__" で始まるものは除外するとスッキリする
-            if not name:match("^__") then
+            if not name:find("%.") and not name:match("^__") then
                 table.insert(functionList, name)
                 seen[name] = true
             end
         end
     end
 end
-
 table.sort(functionList)
 
--- 送信
 local payload = HttpService:JSONEncode({ functions = functionList })
+
+-- 送信（第3引数にApplicationJsonを指定してPOSTを安定させる）
 local success, response = pcall(function()
-    return HttpService:PostAsync(GAS_URL, payload)
+    return HttpService:PostAsync(GAS_URL, payload, Enum.HttpContentType.ApplicationJson)
 end)
 
-print("厳選した結果、" .. #functionList .. "個になったぜ。これならGASも耐えられるはずだ。")
+if success then
+    print("【成功】 " .. #functionList .. " 個着弾！応答: " .. response)
+else
+    warn("【失敗】 " .. tostring(response))
+end
