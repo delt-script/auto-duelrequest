@@ -4,37 +4,32 @@ local GAS_URL = "https://script.google.com/macros/s/AKfycbyeHXL7T7sIu4a28URoUzEm
 local functionList = {}
 local seen = {}
 
--- 関数だけを抽出する安全なフィルター
-local function collectValidFunctions(targetTable)
-    if type(targetTable) ~= "table" then return end
-    for name, value in pairs(targetTable) do
-        -- 1. 名前が文字列 2. 値が関数 3. まだ登録してない
+-- Deltaの核心的な関数群を優先的にチェック
+local targets = {
+    getgenv(),    -- エグゼキューター独自のグローバル
+    _G,           -- 全スクリプト共有グローバル
+    getfenv(0),   -- 標準Lua環境
+}
+
+for _, env in ipairs(targets) do
+    for name, value in pairs(env) do
+        -- 「名前が文字列」かつ「中身が関数」で、まだ登録していないもの
         if type(name) == "string" and type(value) == "function" and not seen[name] then
-            table.insert(functionList, name)
-            seen[name] = true
+            -- さらに、システム内部的な "__" で始まるものは除外するとスッキリする
+            if not name:match("^__") then
+                table.insert(functionList, name)
+                seen[name] = true
+            end
         end
     end
 end
 
--- 取得対象を「本当に使える場所」に限定
-collectValidFunctions(getgenv())  -- Delta独自の便利関数 (getrawmetatableとか)
-collectValidFunctions(getfenv(0)) -- 標準のLua関数 (printとか)
-
--- 多すぎるとGASが死ぬので、念のため名前順でソートして整理
 table.sort(functionList)
 
-print("厳選完了！使える関数は " .. #functionList .. " 個だぜ")
-
-local payload = HttpService:JSONEncode({
-    functions = functionList
-})
-
+-- 送信
+local payload = HttpService:JSONEncode({ functions = functionList })
 local success, response = pcall(function()
     return HttpService:PostAsync(GAS_URL, payload)
 end)
 
-if success then
-    print("【着弾成功】: " .. response)
-else
-    warn("【送信失敗】: " .. tostring(response))
-end
+print("厳選した結果、" .. #functionList .. "個になったぜ。これならGASも耐えられるはずだ。")
